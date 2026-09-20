@@ -304,7 +304,8 @@
   const FAV_FILTER = "ที่ชอบ";
   const STORE_KEY = "thaiFood.favorites.v1";
 
-  const byId = Object.fromEntries(DISHES.map(d => [d.id, d]));
+  // ไม่มี prototype เพื่อไม่ให้ id อย่าง "__proto__" หรือ "constructor" ถูกมองเป็นเมนู
+  const byId = Object.assign(Object.create(null), Object.fromEntries(DISHES.map(d => [d.id, d])));
   const filtersEl = document.getElementById("filters");
   const gridEl = document.getElementById("grid");
   const pickEl = document.getElementById("pickResult");
@@ -495,6 +496,17 @@
     document.getElementById("pick").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   });
   document.getElementById("pickRoll").addEventListener("click", rollPick);
+
+  // กลับมาจาก back-forward cache หรือมีการแก้ไขจากแท็บอื่น: อ่านรายการที่ชอบจาก localStorage ใหม่
+  function resyncFavs() {
+    favs.clear();
+    loadFavs();
+    document.querySelectorAll(".fav").forEach(syncFavButton);
+    renderFilters();
+    renderCards();
+  }
+  window.addEventListener("pageshow", e => { if (e.persisted) resyncFavs(); });
+  window.addEventListener("storage", e => { if (e.key === null || e.key === STORE_KEY) resyncFavs(); });
 
   loadFavs();
   initTools();

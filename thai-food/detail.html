@@ -170,11 +170,14 @@
 <script>
   const STORE_KEY = "thaiFood.favorites.v1"; // ใช้คีย์เดียวกับ index.html เพื่อให้รายการที่ชอบตรงกัน
 
-  const byId = Object.fromEntries(DISHES.map(d => [d.id, d]));
+  // ไม่มี prototype เพื่อไม่ให้ id อย่าง "__proto__" หรือ "constructor" ถูกมองเป็นเมนู
+  const byId = Object.assign(Object.create(null), Object.fromEntries(DISHES.map(d => [d.id, d])));
   const contentEl = document.getElementById("content");
   const noteEl = document.getElementById("storageNote");
   const favs = new Set();
   let canPersist = true;
+  let shown = null;    // เมนูที่กำลังแสดง
+  let favBtn = null;   // ปุ่มถูกใจของเมนูนั้น
 
   function el(tag, cls, text) {
     const node = document.createElement(tag);
@@ -240,6 +243,8 @@
 
     const fav = el("button", "fav");
     fav.type = "button";
+    shown = d;
+    favBtn = fav;
     syncFavButton(fav, d);
     fav.addEventListener("click", () => {
       if (favs.has(d.id)) favs.delete(d.id); else favs.add(d.id);
@@ -287,6 +292,15 @@
 
     contentEl.replaceChildren(dish, ing, pager);
   }
+
+  // กลับมาจาก back-forward cache หรือมีการแก้ไขจากแท็บอื่น: อ่านรายการที่ชอบจาก localStorage ใหม่
+  function resyncFavs() {
+    favs.clear();
+    loadFavs();
+    if (shown) syncFavButton(favBtn, shown);
+  }
+  window.addEventListener("pageshow", e => { if (e.persisted) resyncFavs(); });
+  window.addEventListener("storage", e => { if (e.key === null || e.key === STORE_KEY) resyncFavs(); });
 
   loadFavs();
   const id = new URLSearchParams(location.search).get("id");
