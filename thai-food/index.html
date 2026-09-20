@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>อาหารไทย ที่ต้องลอง</title>
+<meta name="description" content="แนะนำอาหารไทยยอดนิยม 15 เมนู สุ่มเมนูวันนี้ และเก็บเมนูที่ชอบไว้ในเครื่องของคุณ">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=Prompt:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #fff8ec;
+    --surface: #ffffff;
+    --text: #2b2118;
+    --muted: #6b5a4a;
+    --border: #f0dfc4;
+    --accent: #d24e08;
+    --on-accent: #ffffff;
+    --accent-soft: #ffe8d6;
+    --green: #2f7d4f;
+    --shadow: 0 6px 20px rgba(120, 70, 20, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #1c1610;
+      --surface: #2a2118;
+      --text: #f6ead8;
+      --muted: #c2ae95;
+      --border: #3d3123;
+      --accent: #ff8a3d;
+      --on-accent: #1c1610;
+      --accent-soft: #3d2a1a;
+      --green: #6fcf97;
+      --shadow: 0 6px 20px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #1c1610;
+    --surface: #2a2118;
+    --text: #f6ead8;
+    --muted: #c2ae95;
+    --border: #3d3123;
+    --accent: #ff8a3d;
+    --on-accent: #1c1610;
+    --accent-soft: #3d2a1a;
+    --green: #6fcf97;
+    --shadow: 0 6px 20px rgba(0, 0, 0, .35);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  h1, h2, h3, p { margin: 0; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Noto Sans Thai", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; }
+  h1, h2, h3 { font-family: "Prompt", "Noto Sans Thai", sans-serif; line-height: 1.3; text-wrap: balance; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding-block: 72px 56px;
+    background:
+      radial-gradient(circle at 20% 20%, var(--accent-soft), transparent 55%),
+      radial-gradient(circle at 85% 80%, var(--accent-soft), transparent 50%);
+  }
+  .hero .emoji { font-size: 3rem; letter-spacing: .4rem; }
+  .hero h1 { font-size: clamp(2rem, 6vw, 3.4rem); margin-block: 12px; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); max-width: 560px; margin: 0 auto 28px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn {
+    display: inline-block;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+    text-decoration: none;
+    padding: 10px 28px;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    transition: transform .15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost { background: transparent; color: var(--accent); box-shadow: none; }
+  .btn:focus-visible, .chip:focus-visible, .fav:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
+  /* Storage note */
+  .note {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    font-size: .9rem;
+    padding: 8px 16px;
+  }
+
+  /* Sections */
+  .block { padding-block: 48px; }
+  .section-title { font-size: 1.8rem; text-align: center; margin-bottom: 8px; }
+  .section-sub { text-align: center; color: var(--muted); margin-bottom: 24px; }
+
+  /* Today's Pick */
+  #pick { padding-bottom: 8px; }
+  .pick-result { max-width: 560px; margin: 0 auto 20px; }
+  .placeholder {
+    border: 2px dashed var(--border);
+    border-radius: 18px;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .pick-actions { display: flex; justify-content: center; }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 28px; }
+  .chip {
+    font: inherit;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 999px;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+  /* Search and filter tools */
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 16px; }
+  .tools input, .tools select {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    min-height: 44px;
+  }
+  .tools input { flex: 1 1 260px; max-width: 420px; }
+  .tools select { flex: 0 1 auto; }
+  .tools input:focus-visible, .tools select:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .btn.small { padding: 8px 18px; min-height: 44px; box-shadow: none; }
+  .result-count { text-align: center; color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
+
+  /* Cards */
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); }
+  .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 32px 0; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+  }
+  .card .pic {
+    font-size: 4rem;
+    text-align: center;
+    padding: 24px 0 16px;
+    background: linear-gradient(135deg, var(--accent-soft), transparent);
+  }
+  .card .pic.has-img { padding: 0; }
+  .card .pic img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .card .body { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card .head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+  .card h3 { font-size: 1.25rem; }
+  .card .en { color: var(--muted); font-size: .9rem; margin-top: -6px; }
+  .card p { font-size: .95rem; }
+  .card.big .pic { font-size: 5.5rem; }
+  .card.big h3 { font-size: 1.7rem; }
+  .card.big p { font-size: 1rem; }
+  .card.pop { animation: pop .35s ease-out; }
+  @keyframes pop { from { transform: scale(.94); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .tag {
+    font-size: .8rem;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .spice { font-size: .9rem; color: var(--muted); }
+  .spice b { color: var(--accent); letter-spacing: 2px; }
+
+  .fav {
+    flex: none;
+    font: inherit;
+    font-size: .85rem;
+    cursor: pointer;
+    min-height: 36px;
+    padding: 2px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .fav[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+  /* Tastes */
+  .tastes { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); }
+  .taste {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+  .taste .icon { font-size: 2rem; }
+  .taste h3 { font-size: 1.1rem; margin-block: 4px; color: var(--green); }
+  .taste p { color: var(--muted); font-size: .9rem; }
+
+  footer { text-align: center; padding: 32px 16px 48px; color: var(--muted); font-size: .9rem; border-top: 1px solid var(--border); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn { transition: none; }
+    .card.pop { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="emoji" aria-hidden="true">🍜🌶️🥥</div>
+    <h1>อาหารไทย <span>ที่ต้องลอง</span></h1>
+    <p>รวมเมนูไทยยอดนิยม 15 เมนู ตั้งแต่ต้มยำรสจัดจ้านถึงข้าวเหนียวมะม่วงแสนหวาน ยังไม่รู้จะกินอะไร ให้เราสุ่มให้ได้เลย</p>
+    <div class="actions">
+      <button class="btn" type="button" id="heroRoll">🎲 สุ่มเมนูวันนี้</button>
+      <a class="btn ghost" href="#menu">ดูเมนูทั้งหมด</a>
+    </div>
+  </div>
+</header>
+
+<div class="note" id="storageNote" role="status" hidden>บันทึกลงเครื่องนี้ไม่ได้ รายการที่ชอบจะหายเมื่อปิดหน้านี้</div>
+
+<main>
+  <section class="block" id="pick">
+    <div class="wrap">
+      <h2 class="section-title">เมนูวันนี้ของคุณ</h2>
+      <p class="section-sub">กดสุ่มได้ไม่จำกัด จนกว่าจะเจอเมนูที่ถูกใจ</p>
+      <div class="pick-result" id="pickResult" aria-live="polite"></div>
+      <div class="pick-actions"><button class="btn" type="button" id="pickRoll">🎲 สุ่มเมนูวันนี้</button></div>
+    </div>
+  </section>
+
+  <section class="block" id="menu">
+    <div class="wrap">
+      <h2 class="section-title">เมนูแนะนำ</h2>
+      <p class="section-sub">ค้นหาเมนู เลือกหมวด รสชาติ ความเผ็ด หรือกด ♡ เพื่อเก็บเมนูที่ชอบไว้</p>
+      <div class="tools">
+        <input type="search" id="search" placeholder="ค้นหาเมนู เช่น ต้มยำ, curry, กะทิ" aria-label="ค้นหาเมนู" autocomplete="off">
+        <select id="tasteSel" aria-label="กรองตามรสชาติ"></select>
+        <select id="spiceSel" aria-label="กรองตามความเผ็ด">
+          <option value="">ทุกระดับความเผ็ด</option>
+          <option value="0">ไม่เผ็ด</option>
+          <option value="1">เผ็ดน้อย 🌶️</option>
+          <option value="2">เผ็ดกลาง 🌶️🌶️</option>
+          <option value="3">เผ็ดมาก 🌶️🌶️🌶️</option>
+        </select>
+        <button class="btn ghost small" type="button" id="resetBtn" hidden>ล้างตัวกรอง</button>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="กรองตามหมวดอาหาร"></div>
+      <p class="result-count" id="count" role="status"></p>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="block" id="tastes">
+    <div class="wrap">
+      <h2 class="section-title">4 รสหลักของอาหารไทย</h2>
+      <p class="section-sub">หัวใจของอาหารไทยคือความสมดุลของรสชาติ</p>
+      <div class="tastes">
+        <div class="taste"><div class="icon" aria-hidden="true">🌶️</div><h3>เผ็ด</h3><p>จากพริกสดและพริกแห้ง ช่วยเพิ่มความจัดจ้าน</p></div>
+        <div class="taste"><div class="icon" aria-hidden="true">🍋</div><h3>เปรี้ยว</h3><p>จากมะนาว มะขาม และมะม่วง ให้ความสดชื่น</p></div>
+        <div class="taste"><div class="icon" aria-hidden="true">🐟</div><h3>เค็ม</h3><p>จากน้ำปลา เกลือ และกะปิ ให้รสกลมกล่อม</p></div>
+        <div class="taste"><div class="icon" aria-hidden="true">🍯</div><h3>หวาน</h3><p>จากน้ำตาลปี๊บและกะทิ ช่วยถ่วงสมดุลรสอื่น</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>ทำด้วย ❤️ สำหรับคนรักอาหารไทย</footer>
+
+<script>
+  const CATEGORIES = ["ทั้งหมด", "แกง-ซุป", "ผัด-ข้าว", "ยำ-สลัด", "ของหวาน"];
+  const FAV_FILTER = "ที่ชอบ";
+  const STORE_KEY = "thaiFood.favorites.v1";
+
+  // spice: 0-3
+  const DISHES = [
+    { id: "tom-yum-goong", th: "ต้มยำกุ้ง", en: "Tom Yum Goong", cat: "แกง-ซุป", emoji: "🍲", image: "image/tom-yum-goong.png", spice: 3,
+      desc: "ซุปกุ้งรสเปรี้ยวเผ็ดหอมตะไคร้ ข่า และใบมะกรูด อาหารไทยที่โด่งดังไปทั่วโลก",
+      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
+    { id: "tom-kha-gai", th: "ต้มข่าไก่", en: "Tom Kha Gai", cat: "แกง-ซุป", emoji: "🥥", spice: 1,
+      desc: "ซุปไก่กะทิหอมข่า รสนุ่มมันละมุน เผ็ดน้อย ทานง่าย",
+      tastes: ["มัน", "เปรี้ยว", "เค็ม"] },
+    { id: "green-curry", th: "แกงเขียวหวาน", en: "Green Curry", cat: "แกง-ซุป", emoji: "🍛", spice: 2,
+      desc: "แกงกะทิสีเขียวจากพริกแกงสด ใส่มะเขือเปราะและใบโหระพา ทานกับข้าวสวยหรือเส้นขนมจีน",
+      tastes: ["เผ็ด", "มัน", "หวาน"] },
+    { id: "massaman", th: "มัสมั่น", en: "Massaman Curry", cat: "แกง-ซุป", emoji: "🥔", spice: 1,
+      desc: "แกงรสหอมเครื่องเทศ ใส่มันฝรั่งและถั่วลิสง เคี่ยวจนเนื้อนุ่ม",
+      tastes: ["หวาน", "มัน", "เค็ม"] },
+    { id: "pad-thai", th: "ผัดไทย", en: "Pad Thai", cat: "ผัด-ข้าว", emoji: "🍝", spice: 0,
+      desc: "เส้นจันท์ผัดซอสมะขาม ใส่กุ้งสด เต้าหู้ ถั่วงอก และถั่วลิสงป่น บีบมะนาวก่อนทาน",
+      tastes: ["หวาน", "เปรี้ยว", "เค็ม"] },
+    { id: "pad-kra-pao", th: "ผัดกะเพรา", en: "Pad Kra Pao", cat: "ผัด-ข้าว", emoji: "🍳", spice: 3,
+      desc: "เนื้อสัตว์ผัดพริกกระเทียมกับใบกะเพรา เสิร์ฟพร้อมข้าวสวยและไข่ดาว",
+      tastes: ["เผ็ด", "เค็ม"] },
+    { id: "khao-man-gai", th: "ข้าวมันไก่", en: "Khao Man Gai", cat: "ผัด-ข้าว", emoji: "🍗", spice: 0,
+      desc: "ไก่ต้มนุ่มกับข้าวหุงน้ำซุปและน้ำมันไก่ ราดน้ำจิ้มเต้าเจี้ยวรสเข้มข้น",
+      tastes: ["เค็ม", "มัน"] },
+    { id: "som-tam", th: "ส้มตำไทย", en: "Som Tam", cat: "ยำ-สลัด", emoji: "🥗", spice: 3,
+      desc: "มะละกอดิบตำกับมะนาว น้ำปลา พริก และถั่วลิสง กรอบสดชื่น ทานคู่ไก่ย่างและข้าวเหนียว",
+      tastes: ["เปรี้ยว", "เผ็ด", "หวาน"] },
+    { id: "mango-sticky-rice", th: "ข้าวเหนียวมะม่วง", en: "Mango Sticky Rice", cat: "ของหวาน", emoji: "🥭", spice: 0,
+      desc: "ข้าวเหนียวมูนกะทิหอมมัน ทานกับมะม่วงสุกหวานฉ่ำ ราดกะทิเค็มนิด ๆ",
+      tastes: ["หวาน", "มัน"] },
+    { id: "gaeng-som", th: "แกงส้ม", en: "Sour Curry", cat: "แกง-ซุป", emoji: "🥣", spice: 2,
+      desc: "แกงรสเปรี้ยวเผ็ดจากน้ำพริกแกงส้ม น้ำแกงใสไม่ใส่กะทิ ใส่ผักและกุ้งหรือปลา",
+      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
+    { id: "khao-soi", th: "ข้าวซอย", en: "Khao Soi", cat: "แกง-ซุป", emoji: "🍜", spice: 1,
+      desc: "ก๋วยเตี๋ยวไข่ในน้ำแกงกะทิแบบล้านนา โรยเส้นกรอบ ทานกับผักดองและมะนาว",
+      tastes: ["มัน", "เผ็ด", "เค็ม"] },
+    { id: "pad-see-ew", th: "ผัดซีอิ๊ว", en: "Pad See Ew", cat: "ผัด-ข้าว", emoji: "🥡", spice: 0,
+      desc: "เส้นใหญ่ผัดซีอิ๊วดำกับไข่ คะน้า และหมูหรือไก่ หอมกลิ่นกระทะ",
+      tastes: ["หวาน", "เค็ม"] },
+    { id: "yum-woon-sen", th: "ยำวุ้นเส้น", en: "Glass Noodle Salad", cat: "ยำ-สลัด", emoji: "🥢", spice: 2,
+      desc: "วุ้นเส้นคลุกน้ำยำมะนาวพริก ใส่กุ้ง หมูสับ และผักสด รสจัดจ้านสดชื่น",
+      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
+    { id: "larb-moo", th: "ลาบหมู", en: "Larb Moo", cat: "ยำ-สลัด", emoji: "🥩", spice: 2,
+      desc: "หมูสับปรุงรสน้ำมะนาว น้ำปลา พริกป่น และข้าวคั่ว โรยสมุนไพรสด ทานกับข้าวเหนียวและผักสด",
+      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
+    { id: "bua-loi", th: "บัวลอย", en: "Bua Loi", cat: "ของหวาน", emoji: "🍡", spice: 0,
+      desc: "ลูกแป้งข้าวเหนียวกลม ๆ ในน้ำกะทิหวานอุ่น ๆ หอมมัน ทานได้ทั้งร้อนและเย็น",
+      tastes: ["หวาน", "มัน"] },
+  ];
+
+  const byId = Object.fromEntries(DISHES.map(d => [d.id, d]));
+  const filtersEl = document.getElementById("filters");
+  const gridEl = document.getElementById("grid");
+  const pickEl = document.getElementById("pickResult");
+  const noteEl = document.getElementById("storageNote");
+  const searchEl = document.getElementById("search");
+  const tasteSel = document.getElementById("tasteSel");
+  const spiceSel = document.getElementById("spiceSel");
+  const resetBtn = document.getElementById("resetBtn");
+  const countEl = document.getElementById("count");
+
+  let active = "ทั้งหมด";
+  let pick = null;
+  let favChip = null;
+  let canPersist = true;
+  const favs = new Set();
+
+  // ---- Favorites storage (localStorage may be missing or blocked) ----
+  function loadFavs() {
+    let raw = null;
+    try { raw = localStorage.getItem(STORE_KEY); } catch (e) { canPersist = false; }
+    if (raw) {
+      try {
+        const ids = JSON.parse(raw);
+        if (Array.isArray(ids)) ids.forEach(id => { if (byId[id]) favs.add(id); });
+      } catch (e) { /* ignore corrupt data and start empty */ }
+    }
+    noteEl.hidden = canPersist;
+  }
+
+  function saveFavs() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify([...favs])); } catch (e) { canPersist = false; }
+    noteEl.hidden = canPersist;
+  }
+
+  // ---- DOM helpers ----
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function favLabel() { return "♥ ที่ชอบ (" + favs.size + ")"; }
+
+  function syncFavButton(b) {
+    const on = favs.has(b.dataset.id);
+    b.setAttribute("aria-pressed", String(on));
+    b.textContent = on ? "♥ ชอบแล้ว" : "♡ ถูกใจ";
+    b.setAttribute("aria-label", (on ? "เลิกถูกใจ " : "ถูกใจ ") + byId[b.dataset.id].th);
+  }
+
+  function toggleFav(id) {
+    if (favs.has(id)) favs.delete(id); else favs.add(id);
+    saveFavs();
+    document.querySelectorAll('.fav[data-id="' + id + '"]').forEach(syncFavButton);
+    if (favChip) favChip.textContent = favLabel();
+    if (active === FAV_FILTER) renderCards();
+  }
+
+  function dishCard(d, big) {
+    const card = el("article", big ? "card big pop" : "card");
+    const pic = el("div", "pic", d.image ? undefined : d.emoji);
+    if (d.image) {
+      const img = el("img");
+      img.src = d.image;
+      img.alt = d.th;
+      img.loading = "lazy";
+      pic.append(img);
+      pic.classList.add("has-img");
+    } else {
+      pic.setAttribute("aria-hidden", "true");
+    }
+
+    const fav = el("button", "fav");
+    fav.type = "button";
+    fav.dataset.id = d.id;
+    syncFavButton(fav);
+    fav.addEventListener("click", () => toggleFav(d.id));
+
+    const head = el("div", "head");
+    head.append(el("h3", null, d.th), fav);
+
+    const spice = el("div", "spice", "ความเผ็ด: ");
+    spice.append(el("b", null, d.spice ? "🌶️".repeat(d.spice) : "ไม่เผ็ด"));
+
+    const tags = el("div", "tags");
+    d.tastes.forEach(t => tags.append(el("span", "tag", t)));
+
+    const body = el("div", "body");
+    body.append(head, el("div", "en", d.en), el("p", null, d.desc), spice, tags);
+    card.append(pic, body);
+    return card;
+  }
+
+  // ---- Today's Pick ----
+  function renderPick() {
+    if (!pick) {
+      pickEl.replaceChildren(el("div", "placeholder", "ยังไม่รู้จะกินอะไร? กดปุ่ม “สุ่มเมนูวันนี้” แล้วให้เราเลือกให้"));
+      return;
+    }
+    pickEl.replaceChildren(dishCard(pick, true));
+  }
+
+  function rollPick() {
+    // Any Dish except the one just picked, regardless of filter or Favorites.
+    const pool = DISHES.filter(d => !pick || d.id !== pick.id);
+    pick = pool[Math.floor(Math.random() * pool.length)];
+    renderPick();
+    document.getElementById("pickRoll").textContent = "🎲 สุ่มใหม่";
+  }
+
+  // ---- Filters and menu ----
+  function renderFilters() {
+    const chips = CATEGORIES.map(c => makeChip(c, c));
+    favChip = makeChip(FAV_FILTER, favLabel());
+    filtersEl.replaceChildren(...chips, favChip);
+  }
+
+  function makeChip(value, label) {
+    const b = el("button", "chip", label);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(value === active));
+    b.addEventListener("click", () => { active = value; renderFilters(); renderCards(); });
+    return b;
+  }
+
+  function hasFilters() {
+    return active !== "ทั้งหมด" || searchEl.value.trim() !== "" || tasteSel.value !== "" || spiceSel.value !== "";
+  }
+
+  function matches(d) {
+    if (active === FAV_FILTER ? !favs.has(d.id) : (active !== "ทั้งหมด" && d.cat !== active)) return false;
+    if (tasteSel.value && !d.tastes.includes(tasteSel.value)) return false;
+    if (spiceSel.value !== "" && d.spice !== Number(spiceSel.value)) return false;
+    const q = searchEl.value.trim().toLowerCase();
+    if (q) {
+      const hay = [d.th, d.en, d.desc, d.cat, ...d.tastes].join(" ").toLowerCase();
+      if (!q.split(/\s+/).every(w => hay.includes(w))) return false;
+    }
+    return true;
+  }
+
+  function renderCards() {
+    const list = DISHES.filter(matches);
+    resetBtn.hidden = !hasFilters();
+    countEl.textContent = hasFilters()
+      ? "พบ " + list.length + " จาก " + DISHES.length + " เมนู"
+      : "ทั้งหมด " + DISHES.length + " เมนู";
+    if (!list.length) {
+      const onlyFavs = active === FAV_FILTER && !favs.size && !searchEl.value.trim() && !tasteSel.value && spiceSel.value === "";
+      gridEl.replaceChildren(el("p", "empty", onlyFavs
+        ? "ยังไม่มีเมนูที่ชอบ กดปุ่ม ♡ ถูกใจ บนการ์ดเพื่อเก็บไว้ที่นี่"
+        : "ไม่พบเมนูที่ตรงกับเงื่อนไข ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง"));
+      return;
+    }
+    gridEl.replaceChildren(...list.map(d => dishCard(d, false)));
+  }
+
+  function resetFilters() {
+    active = "ทั้งหมด";
+    searchEl.value = "";
+    tasteSel.value = "";
+    spiceSel.value = "";
+    renderFilters();
+    renderCards();
+  }
+
+  function initTools() {
+    const tastes = [...new Set(DISHES.flatMap(d => d.tastes))];
+    tasteSel.replaceChildren(new Option("ทุกรสชาติ", ""), ...tastes.map(t => new Option("รส" + t, t)));
+    searchEl.addEventListener("input", renderCards);
+    tasteSel.addEventListener("change", renderCards);
+    spiceSel.addEventListener("change", renderCards);
+    resetBtn.addEventListener("click", resetFilters);
+  }
+
+  document.getElementById("heroRoll").addEventListener("click", () => {
+    rollPick();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById("pick").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  });
+  document.getElementById("pickRoll").addEventListener("click", rollPick);
+
+  loadFavs();
+  initTools();
+  renderPick();
+  renderFilters();
+  renderCards();
+</script>
+</body>
+</html>
