@@ -190,6 +190,11 @@
     background: var(--accent-soft);
     color: var(--accent);
   }
+  .title-link { color: inherit; text-decoration: none; }
+  .title-link:hover { color: var(--accent); }
+  .more { font-size: .9rem; font-weight: 500; color: var(--accent); text-decoration: none; }
+  .more:hover { text-decoration: underline; }
+  .title-link:focus-visible, .more:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 4px; }
   .spice { font-size: .9rem; color: var(--muted); }
   .spice b { color: var(--accent); letter-spacing: 2px; }
 
@@ -293,59 +298,11 @@
 
 <footer>ทำด้วย ❤️ สำหรับคนรักอาหารไทย</footer>
 
+<script src="dishes.js"></script>
 <script>
   const CATEGORIES = ["ทั้งหมด", "แกง-ซุป", "ผัด-ข้าว", "ยำ-สลัด", "ของหวาน"];
   const FAV_FILTER = "ที่ชอบ";
   const STORE_KEY = "thaiFood.favorites.v1";
-
-  // spice: 0-3
-  const DISHES = [
-    { id: "tom-yum-goong", th: "ต้มยำกุ้ง", en: "Tom Yum Goong", cat: "แกง-ซุป", emoji: "🍲", image: "image/tom-yum-goong.png", spice: 3,
-      desc: "ซุปกุ้งรสเปรี้ยวเผ็ดหอมตะไคร้ ข่า และใบมะกรูด อาหารไทยที่โด่งดังไปทั่วโลก",
-      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
-    { id: "tom-kha-gai", th: "ต้มข่าไก่", en: "Tom Kha Gai", cat: "แกง-ซุป", emoji: "🥥", spice: 1,
-      desc: "ซุปไก่กะทิหอมข่า รสนุ่มมันละมุน เผ็ดน้อย ทานง่าย",
-      tastes: ["มัน", "เปรี้ยว", "เค็ม"] },
-    { id: "green-curry", th: "แกงเขียวหวาน", en: "Green Curry", cat: "แกง-ซุป", emoji: "🍛", spice: 2,
-      desc: "แกงกะทิสีเขียวจากพริกแกงสด ใส่มะเขือเปราะและใบโหระพา ทานกับข้าวสวยหรือเส้นขนมจีน",
-      tastes: ["เผ็ด", "มัน", "หวาน"] },
-    { id: "massaman", th: "มัสมั่น", en: "Massaman Curry", cat: "แกง-ซุป", emoji: "🥔", spice: 1,
-      desc: "แกงรสหอมเครื่องเทศ ใส่มันฝรั่งและถั่วลิสง เคี่ยวจนเนื้อนุ่ม",
-      tastes: ["หวาน", "มัน", "เค็ม"] },
-    { id: "pad-thai", th: "ผัดไทย", en: "Pad Thai", cat: "ผัด-ข้าว", emoji: "🍝", spice: 0,
-      desc: "เส้นจันท์ผัดซอสมะขาม ใส่กุ้งสด เต้าหู้ ถั่วงอก และถั่วลิสงป่น บีบมะนาวก่อนทาน",
-      tastes: ["หวาน", "เปรี้ยว", "เค็ม"] },
-    { id: "pad-kra-pao", th: "ผัดกะเพรา", en: "Pad Kra Pao", cat: "ผัด-ข้าว", emoji: "🍳", spice: 3,
-      desc: "เนื้อสัตว์ผัดพริกกระเทียมกับใบกะเพรา เสิร์ฟพร้อมข้าวสวยและไข่ดาว",
-      tastes: ["เผ็ด", "เค็ม"] },
-    { id: "khao-man-gai", th: "ข้าวมันไก่", en: "Khao Man Gai", cat: "ผัด-ข้าว", emoji: "🍗", spice: 0,
-      desc: "ไก่ต้มนุ่มกับข้าวหุงน้ำซุปและน้ำมันไก่ ราดน้ำจิ้มเต้าเจี้ยวรสเข้มข้น",
-      tastes: ["เค็ม", "มัน"] },
-    { id: "som-tam", th: "ส้มตำไทย", en: "Som Tam", cat: "ยำ-สลัด", emoji: "🥗", spice: 3,
-      desc: "มะละกอดิบตำกับมะนาว น้ำปลา พริก และถั่วลิสง กรอบสดชื่น ทานคู่ไก่ย่างและข้าวเหนียว",
-      tastes: ["เปรี้ยว", "เผ็ด", "หวาน"] },
-    { id: "mango-sticky-rice", th: "ข้าวเหนียวมะม่วง", en: "Mango Sticky Rice", cat: "ของหวาน", emoji: "🥭", spice: 0,
-      desc: "ข้าวเหนียวมูนกะทิหอมมัน ทานกับมะม่วงสุกหวานฉ่ำ ราดกะทิเค็มนิด ๆ",
-      tastes: ["หวาน", "มัน"] },
-    { id: "gaeng-som", th: "แกงส้ม", en: "Sour Curry", cat: "แกง-ซุป", emoji: "🥣", spice: 2,
-      desc: "แกงรสเปรี้ยวเผ็ดจากน้ำพริกแกงส้ม น้ำแกงใสไม่ใส่กะทิ ใส่ผักและกุ้งหรือปลา",
-      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
-    { id: "khao-soi", th: "ข้าวซอย", en: "Khao Soi", cat: "แกง-ซุป", emoji: "🍜", spice: 1,
-      desc: "ก๋วยเตี๋ยวไข่ในน้ำแกงกะทิแบบล้านนา โรยเส้นกรอบ ทานกับผักดองและมะนาว",
-      tastes: ["มัน", "เผ็ด", "เค็ม"] },
-    { id: "pad-see-ew", th: "ผัดซีอิ๊ว", en: "Pad See Ew", cat: "ผัด-ข้าว", emoji: "🥡", spice: 0,
-      desc: "เส้นใหญ่ผัดซีอิ๊วดำกับไข่ คะน้า และหมูหรือไก่ หอมกลิ่นกระทะ",
-      tastes: ["หวาน", "เค็ม"] },
-    { id: "yum-woon-sen", th: "ยำวุ้นเส้น", en: "Glass Noodle Salad", cat: "ยำ-สลัด", emoji: "🥢", spice: 2,
-      desc: "วุ้นเส้นคลุกน้ำยำมะนาวพริก ใส่กุ้ง หมูสับ และผักสด รสจัดจ้านสดชื่น",
-      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
-    { id: "larb-moo", th: "ลาบหมู", en: "Larb Moo", cat: "ยำ-สลัด", emoji: "🥩", spice: 2,
-      desc: "หมูสับปรุงรสน้ำมะนาว น้ำปลา พริกป่น และข้าวคั่ว โรยสมุนไพรสด ทานกับข้าวเหนียวและผักสด",
-      tastes: ["เปรี้ยว", "เผ็ด", "เค็ม"] },
-    { id: "bua-loi", th: "บัวลอย", en: "Bua Loi", cat: "ของหวาน", emoji: "🍡", spice: 0,
-      desc: "ลูกแป้งข้าวเหนียวกลม ๆ ในน้ำกะทิหวานอุ่น ๆ หอมมัน ทานได้ทั้งร้อนและเย็น",
-      tastes: ["หวาน", "มัน"] },
-  ];
 
   const byId = Object.fromEntries(DISHES.map(d => [d.id, d]));
   const filtersEl = document.getElementById("filters");
@@ -428,7 +385,11 @@
     fav.addEventListener("click", () => toggleFav(d.id));
 
     const head = el("div", "head");
-    head.append(el("h3", null, d.th), fav);
+    const title = el("h3");
+    const link = el("a", "title-link", d.th);
+    link.href = "detail.html?id=" + encodeURIComponent(d.id);
+    title.append(link);
+    head.append(title, fav);
 
     const spice = el("div", "spice", "ความเผ็ด: ");
     spice.append(el("b", null, d.spice ? "🌶️".repeat(d.spice) : "ไม่เผ็ด"));
@@ -437,7 +398,11 @@
     d.tastes.forEach(t => tags.append(el("span", "tag", t)));
 
     const body = el("div", "body");
-    body.append(head, el("div", "en", d.en), el("p", null, d.desc), spice, tags);
+    const more = el("a", "more", "ดูส่วนประกอบ →");
+    more.href = link.href;
+    more.setAttribute("aria-label", "ดูส่วนประกอบของ " + d.th);
+
+    body.append(head, el("div", "en", d.en), el("p", null, d.desc), spice, tags, more);
     card.append(pic, body);
     return card;
   }
