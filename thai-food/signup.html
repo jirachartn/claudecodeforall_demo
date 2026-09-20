@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สมัครสมาชิก | อาหารไทย</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&family=Prompt:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav wrap" aria-label="เมนูหลัก">
+  <a class="back" href="index.html">← กลับหน้าแรก</a>
+  <a class="brand" href="index.html">อาหารไทย</a>
+  <div class="nav-end"></div>
+</nav>
+
+<main class="block">
+  <div class="wrap auth">
+    <h1 class="section-title">สมัครสมาชิก</h1>
+    <p class="section-sub">กรอกข้อมูลของคุณ ไม่ต้องตั้งรหัสผ่าน</p>
+
+    <form id="form" novalidate>
+      <label>ชื่อ
+        <input type="text" id="first" maxlength="100" required autocomplete="given-name">
+      </label>
+      <label>นามสกุล
+        <input type="text" id="last" maxlength="100" required autocomplete="family-name">
+      </label>
+      <label>อีเมล
+        <input type="email" id="email" maxlength="254" required autocomplete="email">
+      </label>
+      <label>เบอร์โทร
+        <input type="tel" id="phone" required inputmode="tel" placeholder="0812345678" autocomplete="tel">
+      </label>
+      <p class="note-inline" id="msg" role="status" aria-live="polite"></p>
+      <button class="btn" type="submit" id="submit">สมัครสมาชิก</button>
+    </form>
+  </div>
+</main>
+
+<footer>ทำด้วย ❤️ สำหรับคนรักอาหารไทย</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // publishable key ใส่ในเบราว์เซอร์ได้ ตาราง members เปิด RLS ให้เพิ่มข้อมูลได้อย่างเดียว อ่านไม่ได้
+  const db = supabase.createClient(
+    "https://oaqwccranpxymkihztud.supabase.co",
+    "sb_publishable_XlRXpecUEQRpKmoLGbsm-g_ypkb4qbH"
+  );
+  const $ = id => document.getElementById(id);
+
+  $("form").onsubmit = async e => {
+    e.preventDefault();
+    const row = {
+      first_name: $("first").value.trim(),
+      last_name: $("last").value.trim(),
+      email: $("email").value.trim(),
+      phone: $("phone").value.replace(/[\s-]/g, ""),
+    };
+    if (!row.first_name || !row.last_name) { $("msg").textContent = "กรอกชื่อและนามสกุล"; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(row.email)) { $("msg").textContent = "อีเมลไม่ถูกต้อง"; return; }
+    if (!/^0\d{8,9}$/.test(row.phone)) { $("msg").textContent = "เบอร์โทรต้องขึ้นต้นด้วย 0 และมี 9-10 หลัก"; return; }
+
+    $("submit").disabled = true;
+    $("msg").textContent = "";
+    const { error } = await db.from("members").insert(row);
+    $("submit").disabled = false;
+    if (error) {
+      $("msg").textContent = error.code === "23505" ? "อีเมลนี้สมัครสมาชิกแล้ว" : "สมัครไม่สำเร็จ ลองใหม่อีกครั้ง";
+      return;
+    }
+    $("form").reset();
+    $("msg").textContent = "สมัครสมาชิกเรียบร้อยแล้ว ขอบคุณครับ";
+  };
+</script>
+</body>
+</html>
